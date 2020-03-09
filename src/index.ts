@@ -1,21 +1,30 @@
-class Human {
-  public name: string;
-  public age: number;
-  public gender: string;
-  constructor(name: string, age: number, gender: string) {
-    this.name = name;
-    this.age = age;
-    this.gender = gender;
+class Block {
+  public index: number;
+  public hash: string;
+  public previousHash: string;
+  public data: string;
+  public timestamp: number;
+  constructor(
+    index: number,
+    hash: string,
+    previousHash: string,
+    data: string,
+    timestamp: number
+  ) {
+    this.index = index;
+    this.hash = hash;
+    this.previousHash = previousHash;
+    this.data = data;
+    this.timestamp = timestamp;
   }
 }
 
-const keon = new Human("keon", 22, "male");
+const genesisBlock: Block = new Block(0, "202020202", "", "Hello", 123456);
 
-const sayHi = (person: Human): string => {
-  const { name, age, gender } = person;
-  return `Hello ${name}, you are ${age}, you are a ${gender}!`;
-};
+let blockchain: [Block] = [genesisBlock];
 
-console.log(sayHi(keon));
+// Following is not working because '"stuff"' is not of a type Block! This is typescript!
+// blockchain.push("stuff");
+console.log(blockchain);
 
 export {};
