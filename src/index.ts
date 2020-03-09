@@ -1,9 +1,27 @@
+import * as CryptoJS from "crypto-js";
+
 class Block {
+  static calculateBlockHash = (
+    index: number,
+    previousHash: string,
+    timestamp: number,
+    data: string
+  ): string =>
+    CryptoJS.SHA256(index + previousHash + timestamp + data).toString();
+
+  static validateStructure = (aBlock: Block): boolean =>
+    typeof aBlock.index === "number" &&
+    typeof aBlock.previousHash === "string" &&
+    typeof aBlock.hash === "string" &&
+    typeof aBlock.timestamp === "number" &&
+    typeof aBlock.data === "string";
+
   public index: number;
   public hash: string;
   public previousHash: string;
   public data: string;
   public timestamp: number;
+
   constructor(
     index: number,
     hash: string,
@@ -21,10 +39,48 @@ class Block {
 
 const genesisBlock: Block = new Block(0, "202020202", "", "Hello", 123456);
 
-let blockchain: [Block] = [genesisBlock];
+let blockchain: Block[] = [genesisBlock];
 
-// Following is not working because '"stuff"' is not of a type Block! This is typescript!
-// blockchain.push("stuff");
+// // Following is not working because '"stuff"' is not of a type Block! This is typescript!
+// // blockchain.push("stuff");
+// console.log(blockchain);
+
+const getBlockchain = (): Block[] => blockchain;
+
+const getLatestBlock = (): Block => blockchain[blockchain.length - 1];
+
+const getNewTimeStamp = (): number => Math.round(new Date().getTime());
+
+const createNewBlock = (data: string): Block => {
+  const previousBlock: Block = getLatestBlock();
+  const newIndex: number = previousBlock.index + 1;
+  const newTimeStamp: number = getNewTimeStamp();
+  const newHash: string = Block.calculateBlockHash(
+    newIndex,
+    previousBlock.hash,
+    newTimeStamp,
+    data
+  );
+  const newBlock: Block = new Block(
+    newIndex,
+    newHash,
+    previousBlock.hash,
+    data,
+    newTimeStamp
+  );
+  return newBlock;
+};
+
+const isBlockValid = (candidateBlock: Block, previousBlock: Block): boolean => {
+  if (!Block.validateStructure(candidateBlock)) {
+    return false;
+  } else if (previousBlock.index + 1 !== candidateBlock.index) {
+    return false;
+  } else if (previousBlock.hash !== candidateBlock.previousHash) {
+    return false;
+  }
+};
+
 console.log(blockchain);
 
 export {};
